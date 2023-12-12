@@ -28,5 +28,5 @@ const server = http.createServer(async (req, res) => {
     });
 });
 
-const PORT = 3000;
+const PORT = process.env.LISTEN_PORT || 3000;
 server.listen(PORT, () => console.log(`Server up and running on port ${PORT}`));
