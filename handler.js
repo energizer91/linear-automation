@@ -57,7 +57,7 @@ const handler = async (event) => {
 
 	try {
 		const payload = JSON.parse(event.body);
-		const { data: issue, updatedFrom } = payload;
+		const { data: issue, updatedFrom = {} } = payload;
 		const { description } = issue;
 
 		const isExperiment = issue.labelIds.includes(LABELS.EXPERIMENT);
@@ -67,22 +67,6 @@ const handler = async (event) => {
 
 		if (isAutomated || !isExperiment || !isMovedToRefinement || !isMovedFromBacklog) {
 			// Invalid case, early return
-
-			if (isAutomated) {
-				console.log('Issue has already been automated');
-			}
-
-			if (!isExperiment) {
-				console.log('Issue is not an experiment');
-			}
-
-			if (!isMovedToRefinement) {
-				console.log('Issue is not moved to refinement');
-			}
-
-			if (!isMovedFromBacklog) {
-				console.log('Issue is not moved to backlog');
-			}
 
 			return {
 				statusCode: 200,
