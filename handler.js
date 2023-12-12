@@ -68,6 +68,22 @@ const handler = async (event) => {
 		if (isAutomated || !isExperiment || !isMovedToRefinement || !isMovedFromBacklog) {
 			// Invalid case, early return
 
+			if (isAutomated) {
+				console.log('Issue has already been automated');
+			}
+
+			if (!isExperiment) {
+				console.log('Issue is not an experiment');
+			}
+
+			if (!isMovedToRefinement) {
+				console.log('Issue is not moved to refinement');
+			}
+
+			if (!isMovedFromBacklog) {
+				console.log('Issue is not moved to backlog');
+			}
+
 			return {
 				statusCode: 200,
 				body: JSON.stringify({

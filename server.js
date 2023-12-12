@@ -18,13 +18,22 @@ const server = http.createServer(async (req, res) => {
 
     // Once all data is received
     req.on('end', async () => {
-        console.log(body); // Log the complete body
+        // console.log(body); // Log the complete body
+        console.log('new webhook event');
 
-        const result = await handler({ body });
+        try {
+            const result = await handler({ body });
 
-        // Send a response back to the client
-        res.writeHead(result.statusCode, { 'Content-Type': 'application/json' });
-        res.end(result.body);
+            console.log('handler successfully finished with result', result);
+
+            // Send a response back to the client
+            res.writeHead(result.statusCode, { 'Content-Type': 'application/json' });
+            res.end(result.body);
+        } catch (e) {
+            console.error('Webhook error', e);
+            res.writeHead(500, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({e}));
+        }
     });
 });
 
