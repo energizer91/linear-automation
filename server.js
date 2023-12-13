@@ -1,8 +1,7 @@
 require("dotenv").config();
 
 const http = require("http");
-const crypto = require("crypto");
-const handler = require("./handler");
+const { handler } = require("./handler");
 
 const server = http.createServer(async (req, res) => {
   if (req.method !== "POST") {
@@ -20,26 +19,10 @@ const server = http.createServer(async (req, res) => {
   // Once all data is received
   req.on("end", async () => {
     // console.log(body); // Log the complete body
-    if (process.env.LINEAR_WEBHOOK_SIGNING_SECRET) {
-      const signature = crypto
-        .createHmac("sha256", process.env.LINEAR_WEBHOOK_SIGNING_SECRET)
-        .update(body)
-        .digest("hex");
-
-      if (signature !== req.headers["linear-signature"]) {
-        console.error("webhook signature is invalid");
-
-        res.writeHead(500, { "Content-Type": "application/json" });
-        res.end(JSON.stringify({ message: "webhook signature is invalid" }));
-
-        return;
-      }
-    }
-
     console.log("new webhook event");
 
     try {
-      const result = await handler({ body });
+      const result = await handler({ body, headers: req.headers });
 
       console.log("handler successfully finished with result", result);
 

@@ -1,21 +1,35 @@
+const crypto = require("crypto");
 const { LinearClient } = require("@linear/sdk");
 const { LABELS, STATUSES, TEMPLATES } = require("./constants");
 const {
   experimentDescription,
   designDescription,
-  devDescription,
+  devDescription
 } = require("./descriptions");
 
 const linearClient = new LinearClient({ apiKey: process.env.LINEAR_API_KEY });
 
 const formatResponse = (body, statusCode = 200) => ({
   statusCode,
-  body: JSON.stringify(body),
+  body: JSON.stringify(body)
 });
 
 const handler = async (event) => {
   if (!event.body) {
     return formatResponse({ message: "No webhook data" });
+  }
+
+  if (process.env.LINEAR_WEBHOOK_SIGNING_SECRET) {
+    const signature = crypto
+      .createHmac("sha256", process.env.LINEAR_WEBHOOK_SIGNING_SECRET)
+      .update(event.body)
+      .digest("hex");
+
+    if (signature !== event.headers["linear-signature"]) {
+      console.error("webhook signature is invalid");
+
+      return formatResponse({ message: "webhook signature is invalid" }, 500);
+    }
   }
 
   try {
@@ -41,14 +55,14 @@ const handler = async (event) => {
         isExperiment,
         isAutomated,
         isMovedToRefinement,
-        isMovedFromBacklog,
+        isMovedFromBacklog
       });
     }
 
     // Update experiment issue
     await linearClient.updateIssue(issue.id, {
       description: experimentDescription(description),
-      labelIds: issue.labelIds.concat(LABELS.AUTOMATED),
+      labelIds: issue.labelIds.concat(LABELS.AUTOMATED)
     });
 
     // Create dev task
@@ -61,7 +75,7 @@ const handler = async (event) => {
       labelIds: [LABELS.DEV, LABELS.HOLD],
       templateId: TEMPLATES.DEV,
       description: devDescription(description),
-      priority: issue.priority,
+      priority: issue.priority
     });
 
     // Create design task
@@ -74,7 +88,7 @@ const handler = async (event) => {
       labelIds: [LABELS.DESIGN],
       templateId: TEMPLATES.DESIGN,
       description: designDescription(description),
-      priority: issue.priority,
+      priority: issue.priority
     });
 
     // Create cleanup task
@@ -86,7 +100,7 @@ const handler = async (event) => {
       stateId: STATUSES.COMING_UP,
       labelIds: [LABELS.DEV, LABELS.HOLD],
       templateId: TEMPLATES.DEV,
-      priority: issue.priority,
+      priority: issue.priority
     });
 
     // Return a response
@@ -95,9 +109,9 @@ const handler = async (event) => {
     return formatResponse({
       message: "Internal Server Error",
       error: e.message,
-      stack: e.stack,
+      stack: e.stack
     });
   }
 };
 
-module.exports = handler;
+module.exports = { handler };
