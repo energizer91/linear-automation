@@ -1,0 +1,27 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: 'AWS::Serverless-2016-10-31'
+Resources:
+  LinearAutomationFunction:
+    Type: 'AWS::Serverless::Function'
+    Properties:
+      Handler: handler.handler
+      Runtime: nodejs20.x
+      CodeUri: .
+      Environment:
+        Variables:
+          LINEAR_API_KEY: !Ref LinearApiKey
+          LINEAR_WEBHOOK_SIGNING_SECRET: !Ref LinearWebhookSigningSecret
+      Events:
+        Api:
+          Type: Api
+          Properties:
+            Path: /webhook
+            Method: post
+
+Parameters:
+  LinearApiKey:
+    Type: String
+    Description: Linear API Key
+  LinearWebhookSigningSecret:
+    Type: String
+    Description: Linear Webhook signing secret
