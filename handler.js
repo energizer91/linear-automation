@@ -22,7 +22,7 @@ const handler = async (event) => {
   if (process.env.LINEAR_WEBHOOK_SIGNING_SECRET) {
     const signature = crypto
       .createHmac("sha256", process.env.LINEAR_WEBHOOK_SIGNING_SECRET)
-      .update(event.body, 'utf8')
+      .update(event.body, "utf8")
       .digest("hex");
 
     if (signature !== event.headers["Linear-Signature"]) {
@@ -49,6 +49,12 @@ const handler = async (event) => {
       !isMovedFromBacklog
     ) {
       // Invalid case, early return
+      console.log("Webhook case status invalid", {
+        isAutomated,
+        isExperiment,
+        isMovedFromBacklog,
+        isMovedToRefinement
+      });
 
       return formatResponse({
         message: "Webhook issue status invalid",
