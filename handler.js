@@ -22,10 +22,10 @@ const handler = async (event) => {
   if (process.env.LINEAR_WEBHOOK_SIGNING_SECRET) {
     const signature = crypto
       .createHmac("sha256", process.env.LINEAR_WEBHOOK_SIGNING_SECRET)
-      .update(event.body)
+      .update(event.body || "", "utf8")
       .digest("hex");
 
-    if (signature !== event.headers["linear-signature"]) {
+    if (!crypto.timingSafeEqual(Buffer.from(event.headers["linear-signature"], "utf8"), Buffer.from(signature, "utf8"))) {
       console.error("webhook signature is invalid");
 
       return formatResponse({ message: "webhook signature is invalid" }, 500);
