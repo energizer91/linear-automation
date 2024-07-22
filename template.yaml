@@ -11,12 +11,8 @@ Resources:
         Variables:
           LINEAR_API_KEY: !Ref LinearApiKey
           LINEAR_WEBHOOK_SIGNING_SECRET: !Ref LinearWebhookSigningSecret
-      Events:
-        Api:
-          Type: Api
-          Properties:
-            Path: /webhook
-            Method: post
+      FunctionUrlConfig:
+        AuthType: NONE
 
 Parameters:
   LinearApiKey:
