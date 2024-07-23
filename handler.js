@@ -26,7 +26,7 @@ const handler = async (event) => {
       .digest("hex");
 
     if (signature !== event.headers["Linear-Signature"]) {
-      console.error("webhook signature is invalid");
+      console.error("webhook signature is invalid", signature, event.headers);
 
       return formatResponse({ message: "webhook signature is invalid" }, 500);
     }
