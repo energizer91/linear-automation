@@ -7,6 +7,7 @@ Resources:
       Handler: handler.handler
       Runtime: nodejs20.x
       CodeUri: .
+      Timeout: 30
       Environment:
         Variables:
           LINEAR_API_KEY: !Ref LinearApiKey
