@@ -65,7 +65,7 @@ const handler = async (event) => {
       });
     }
 
-    console.log("Processing task", issue, updatedFrom);
+    console.log("Processing task", issue.identifier, issue.title);
 
     // Update experiment issue
     await linearClient.updateIssue(issue.id, {
@@ -116,7 +116,7 @@ const handler = async (event) => {
     // Return a response
     return formatResponse({ message: "Webhook processed" });
   } catch (e) {
-    console.log("Error while running webhook:", e);
+    console.error("Error while running webhook:", e);
     return formatResponse({
       message: "Internal Server Error",
       error: e.message,
