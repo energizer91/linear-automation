@@ -19,18 +19,16 @@ const handler = async (event) => {
     return formatResponse({ message: "No webhook data" });
   }
 
-  if (process.env.LINEAR_WEBHOOK_SIGNING_SECRET) {
-    const signature = crypto
-      .createHmac("sha256", process.env.LINEAR_WEBHOOK_SIGNING_SECRET)
-      .update(event.body, "utf8")
-      .digest("hex");
-    const eventSignature = event.headers["Linear-Signature"] || event.headers["linear-signature"];
+  const signature = crypto
+    .createHmac("sha256", process.env.LINEAR_WEBHOOK_SIGNING_SECRET)
+    .update(event.body, "utf8")
+    .digest("hex");
+  const eventSignature = event.headers["Linear-Signature"] || event.headers["linear-signature"];
 
-    if (signature !== eventSignature) {
-      console.error("webhook signature is invalid", signature, event.headers);
+  if (signature !== eventSignature) {
+    console.error("webhook signature is invalid", signature, event.headers);
 
-      return formatResponse({ message: "webhook signature is invalid" }, 500);
-    }
+    return formatResponse({ message: "webhook signature is invalid" }, 500);
   }
 
   try {
@@ -65,6 +63,8 @@ const handler = async (event) => {
         isMovedFromBacklog
       });
     }
+
+    console.log("Processing task", issue, updatedFrom);
 
     // Update experiment issue
     await linearClient.updateIssue(issue.id, {
@@ -106,13 +106,16 @@ const handler = async (event) => {
       title: `[Clean up] ${issue.title}`,
       stateId: STATUSES.COMING_UP,
       labelIds: [LABELS.DEV, LABELS.HOLD],
-      templateId: TEMPLATES.DEV,
+      templateId: TEMPLATES.CLEANUP,
       priority: issue.priority
     });
+
+    console.log("Webhook automation finished successfully");
 
     // Return a response
     return formatResponse({ message: "Webhook processed" });
   } catch (e) {
+    console.error("Error while running webhook:", e);
     return formatResponse({
       message: "Internal Server Error",
       error: e.message,
