@@ -34,25 +34,22 @@ const handler = async (event) => {
 
   try {
     const payload = JSON.parse(event.body);
-    const { data: issue, updatedFrom = {} } = payload;
+    const { data: issue } = payload;
     const { description } = issue;
 
     const isExperiment = issue.labelIds.includes(LABELS.EXPERIMENT);
     const isAutomated = issue.labelIds.includes(LABELS.AUTOMATED);
     const isMovedToRefinement = issue.stateId === STATUSES.REFINEMENT;
-    const isMovedFromBacklog = updatedFrom.stateId === STATUSES.BACKLOG;
 
     if (
       isAutomated ||
       !isExperiment ||
-      !isMovedToRefinement ||
-      !isMovedFromBacklog
+      !isMovedToRefinement
     ) {
       // Invalid case, early return
       console.log("Webhook case status invalid", {
         isAutomated,
         isExperiment,
-        isMovedFromBacklog,
         isMovedToRefinement
       });
 
@@ -61,7 +58,6 @@ const handler = async (event) => {
         isExperiment,
         isAutomated,
         isMovedToRefinement,
-        isMovedFromBacklog
       });
     }
 
