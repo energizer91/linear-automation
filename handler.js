@@ -115,7 +115,7 @@ const handler = async (event) => {
     // Return a response
     return formatResponse({ message: "Webhook processed" });
   } catch (e) {
-    console.error("Error while running webhook:", e);
+    console.log("Error while running webhook:", e);
     return formatResponse({
       message: "Internal Server Error",
       error: e.message,
