@@ -11,6 +11,7 @@ const linearClient = new LinearClient({ apiKey: process.env.LINEAR_API_KEY });
 
 const formatResponse = (body, statusCode = 200) => ({
   statusCode,
+  headers: { "Content-Type": "application/json" },
   body: JSON.stringify(body)
 });
 

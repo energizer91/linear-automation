@@ -14,6 +14,8 @@ Resources:
           LINEAR_WEBHOOK_SIGNING_SECRET: !Ref LinearWebhookSigningSecret
       FunctionUrlConfig:
         AuthType: NONE
+      EventInvokeConfig:
+        MaximumRetryAttempts: 0
 
 Parameters:
   LinearApiKey:
